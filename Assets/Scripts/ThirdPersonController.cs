@@ -15,8 +15,10 @@ public class ThirdPersonController : MonoBehaviour
     public LayerMask groundLayer;
 
     public float gravityForce = 9.81f;
+    public float jumpAmount;
 
     Vector3 velocity = new Vector3();
+    bool jumpPressed = false;
 
     // Update is called once per frame
     void Update()
@@ -27,6 +29,17 @@ public class ThirdPersonController : MonoBehaviour
         {
             velocity.y = -2f;
         }
+
+
+        if (Input.GetAxis("Jump") > 0 && onGround)
+        {
+            velocity.y += jumpAmount;
+            //jumpPressed = true;
+        }
+  //      if (Input.GetAxis("Jump") < Mathf.Epsilon)
+		//{
+  //          jumpPressed = false;
+		//}
 
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
