@@ -13,9 +13,12 @@ public class PathwayController : MonoBehaviour
 
     Vector3[] realPositions;
     Vector3 [] originalPositions;
-    Vector3 [] startPositions;
+    Vector3[] startPositions;
+    Quaternion[] startRotation;
+    Quaternion[] originalRotation;
     float[] completedAmounts;
     float[] startTimes;
+    float timeToFinishRot;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,12 +28,17 @@ public class PathwayController : MonoBehaviour
         startPositions = new Vector3[pathCount];
         completedAmounts = new float[pathCount];
         startTimes = new float[pathCount];
+        startRotation = new Quaternion[pathCount];
+        originalRotation = new Quaternion[pathCount];
+        timeToFinishRot = timeToFinish / 6;
         int i = 0;
 
         foreach(Transform child in GFXParent)
 		{
             realPositions[i] = child.position;
             originalPositions[i] = child.localPosition;
+            originalRotation[i] = child.localRotation;
+            startRotation[i] = Random.rotation;
             Vector3 newPos = child.localPosition;
             newPos.y -= offsetDistance;
             child.localPosition = newPos;
@@ -57,12 +65,15 @@ public class PathwayController : MonoBehaviour
 			} else
 			{
                 float timePassed = Time.time - startTimes[i];
-                if(timePassed > timeToFinish)
-                {
-                    timePassed = timeToFinish;
-                }
+                float moveAmount = timePassed / timeToFinish;
+                moveAmount = Mathf.Clamp(moveAmount, 0, 1);
+                child.localPosition = Vector3.Lerp(startPositions[i], originalPositions[i], moveAmount);
 
-                child.localPosition = Vector3.Lerp(startPositions[i], originalPositions[i], timePassed / timeToFinish);
+                float startRot = startTimes[i] + timeToFinish - timeToFinishRot;
+                float timePassedRot = Time.time - startRot;
+                float rotAmount = timePassedRot / timeToFinishRot;
+                rotAmount = Mathf.Clamp(rotAmount, 0, 1);
+                child.localRotation = Quaternion.Lerp(startRotation[i], originalRotation[i], rotAmount);
             }
             i++;
         }
